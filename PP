@@ -10,4 +10,8 @@ We value your privacy rights. Please read and understand the following privacy p
 
 4. We do not sell, trade, or transfer your personal information to third parties.
 
+5. We do not store any message content, if you have relevant doubts, you can not use relevant instructions.
+
+6. You can use the directive to delete related data you use.
+
 By using this bot, you acknowledge that you have read, understood, and agree to the terms outlined in the privacy policy. If you do not agree with the policy, please refrain from using this bot.
