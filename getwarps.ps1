@@ -8,11 +8,14 @@ Write-Output "Finding game..."
 $appData = [Environment]::GetFolderPath("ApplicationData")
 $logPath = "$appData\..\LocalLow\Cognosphere\Star Rail\Player.log"
 $logContent = Get-Content $logPath #-First 1).replace("Loading player data from ", "").replace("/data.unity3d", "")
-$fileList = Get-ChildItem -Path $targetDir -Filter $extFilter | Sort-Object LastWriteTime -Descending
+
+$extFilter = "/data.unity3d"
+$fileList = Get-ChildItem -Path $logPath -Filter $extFilter | Sort-Object LastWriteTime -Descending
 
 $latestFile = $fileList[0].FullName
 $cacheText = Get-Content $latestFile -Raw
 Write-Host "Latest file path: $latestFile"
+Write-Host "$cacheText"
 
 $gamePath = ""
 
