@@ -12,14 +12,9 @@ $logPath = "$appData\..\LocalLow\Cognosphere\Star Rail\Player.log"
 $extFilter = "*.unity3d"
 $fileList = Get-ChildItem -Path $logPath -Filter $extFilter | Sort-Object LastWriteTime -Descending
 
-# 確保有結果再執行以下操作
-if ($fileList.Count -gt 0) {
-    # 獲取最新修改的文件的完整路徑
-    $latestFile = $fileList[0]
-    Write-Host "最新文件路徑：$latestFile"
-} else {
-    Write-Host "沒有找到符合條件的文件。"
-}
+$latestFile = $fileList[0]
+Write-Host "最新文件路徑：$latestFile"
+
 
 $gamePath = ""
 
