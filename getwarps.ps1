@@ -10,12 +10,10 @@ $logPath = "$appData\..\LocalLow\Cognosphere\Star Rail\Player.log"
 $logContent = Get-Content $logPath #-First 1).replace("Loading player data from ", "").replace("/data.unity3d", "")
 $fileList = Get-ChildItem -Path $targetDir -Filter $extFilter | Sort-Object LastWriteTime -Descending
 
-# 获取修改时间最新的文件的内容
-if ($fileList.Count -gt 0) {
-    $latestFile = $fileList[0].FullName
-    $cacheText = Get-Content $latestFile -Raw
-    Write-Host "Latest file path: $latestFile"
-}
+$latestFile = $fileList[0].FullName
+$cacheText = Get-Content $latestFile -Raw
+Write-Host "Latest file path: $latestFile"
+
 $gamePath = ""
 
 for ($i = $logContent.Length - 1; $i -ge 0; $i--) {
@@ -30,9 +28,9 @@ for ($i = $logContent.Length - 1; $i -ge 0; $i--) {
 if ($gamePath -ne "") {
     #Find Gacha Url
     Write-Output "Finding Gacha Url..."
-    Copy-Item -Path "$gamePath/webCaches/*/Cache/Cache_Data/data_2" -Destination "$gamePath/webCaches/*/Cache/Cache_Data/data_2_copy"
-    $cacheData = Get-Content -Encoding UTF8 -Raw "$gamePath/webCaches/*/Cache/Cache_Data/data_2_copy"
-    Remove-Item -Path "$gamePath/webCaches/*/Cache/Cache_Data/data_2_copy"
+    Copy-Item -Path "$gamePath/webCaches/$latestFile/Cache/Cache_Data/data_2" -Destination "$gamePath/webCaches/$latestFile/Cache/Cache_Data/data_2_copy"
+    $cacheData = Get-Content -Encoding UTF8 -Raw "$gamePath/webCaches/$latestFile/Cache/Cache_Data/data_2_copy"
+    Remove-Item -Path "$gamePath/webCaches/$latestFile/Cache/Cache_Data/data_2_copy"
     $cacheDataLines = $cacheData -split '1/0/'
     $foundUrl = "false"
 
