@@ -7,15 +7,19 @@ Write-Output "Finding game..."
 
 $appData = [Environment]::GetFolderPath("ApplicationData")
 $logPath = "$appData\..\LocalLow\Cognosphere\Star Rail\Player.log"
-$logContent = Get-Content $logPath #-First 1).replace("Loading player data from ", "").replace("/data.unity3d", "")
 
-$extFilter = "/data.unity3d"
+# 獲取所有符合條件的文件並按最後修改時間排序
+$extFilter = "*.unity3d"
 $fileList = Get-ChildItem -Path $logPath -Filter $extFilter | Sort-Object LastWriteTime -Descending
 
-$latestFile = $fileList[0].FullName
-$cacheText = Get-Content $latestFile -Raw
-Write-Host "Latest file path: $latestFile"
-Write-Host "$cacheText"
+# 確保有結果再執行以下操作
+if ($fileList.Count -gt 0) {
+    # 獲取最新修改的文件的完整路徑
+    $latestFile = $fileList[0]
+    Write-Host "最新文件路徑：$latestFile"
+} else {
+    Write-Host "沒有找到符合條件的文件。"
+}
 
 $gamePath = ""
 
