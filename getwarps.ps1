@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.Web
 $ProgressPreference = 'SilentlyContinue'
 
 #Find Game
-Write-Output "尋找遊戲中..."
+Write-Output "Finding game..."
 
 $appData = [Environment]::GetFolderPath("ApplicationData")
 $logPath = "$appData\..\LocalLow\Cognosphere\Star Rail\Player.log"
@@ -22,7 +22,7 @@ for ($i = $logContent.Length - 1; $i -ge 0; $i--) {
 
 if ($gamePath -ne "") {
     #Find Gacha Url
-    Write-Output "尋找躍遷網址..."
+    Write-Output "Finding Gacha Url..."
     Copy-Item -Path "$gamePath/webCaches/$version/Cache/Cache_Data/data_2" -Destination "$gamePath/webCaches/$version/Cache/Cache_Data/data_2_copy"
     $cacheData = Get-Content -Encoding UTF8 -Raw "$gamePath/webCaches/$version/Cache/Cache_Data/data_2_copy"
     Remove-Item -Path "$gamePath/webCaches/$version/Cache/Cache_Data/data_2_copy"
@@ -40,7 +40,7 @@ if ($gamePath -ne "") {
             if ($response.retcode -eq 0) {
                 Write-Output $url
                 Set-Clipboard -Value $url
-                Write-Output "躍遷紀錄 URL 已保存到剪貼板。"
+                Write-Output "Warp History Url has been saved to clipboard."
                 $foundUrl = "true"
                 return
             }
@@ -48,8 +48,8 @@ if ($gamePath -ne "") {
     }
 
     if ($foundUrl -eq "false") {
-        Write-Output "無法找到躍遷網址。 請在遊戲中打開躍遷歷史記錄。"
+        Write-Output "Unable to find Gacha Url. Please open warp history in-game."
     }
 } else {
-    Write-Output "無法找到遊戲路徑。 請嘗試重新打開遊戲。"
+    Write-Output "Unable to find Game Path. Please try re-opening the game."
 }
