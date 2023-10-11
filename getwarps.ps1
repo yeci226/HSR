@@ -9,7 +9,7 @@ $appData = [Environment]::GetFolderPath("ApplicationData")
 $logPath = "$appData\..\LocalLow\Cognosphere\Star Rail\Player.log"
 $logContent = Get-Content $logPath #-First 1).replace("Loading player data from ", "").replace("/data.unity3d", "")
 $gamePath = ""
-$version = "2.15.0.0"
+$version = "2.16.0.0"
 
 for ($i = $logContent.Length - 1; $i -ge 0; $i--) {
     $line = $logContent[$logContent.Length -$i]
