@@ -11,11 +11,9 @@ $logContent = Get-Content $logPath #-First 1).replace("Loading player data from 
 $gamePath = ""
 $version = "2.19.0.0"
 
-for ($i = $logContent.Length - 1; $i -ge 0; $i--) {
-    $line = $logContent[$logContent.Length -$i]
-    
-    if ($line -and $line.startsWith("Loading player data from")) {
-        $gamePath = $line.replace("Loading player data from ", "").replace("/data.unity3d", "")
+foreach ($line in $logContent) {
+    if ($line -ne $null -and $line.StartsWith("Loading player data from")) {
+        $gamePath = $line -replace "Loading player data from |\/data.unity3d", ""
         break
     }
 }
