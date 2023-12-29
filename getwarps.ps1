@@ -1,55 +1,56 @@
-#Edited version of starrailstation.com's method
+# Edited version of starrailstation.com's method
+# based on repo https://github.com/yeci226/HSR
 Add-Type -AssemblyName System.Web
 $ProgressPreference = 'SilentlyContinue'
 
-#Find Game
+# Find Player log
 Write-Output "Finding game..."
+$logContent = Get-Content -Path "$([Environment]::GetFolderPath('ApplicationData'))\..\LocalLow\Cognosphere\Star Rail\Player.log"
 
-$appData = [Environment]::GetFolderPath("ApplicationData")
-$logPath = "$appData\..\LocalLow\Cognosphere\Star Rail\Player.log"
-$logContent = Get-Content $logPath #-First 1).replace("Loading player data from ", "").replace("/data.unity3d", "")
-$gamePath = ""
-$version = "2.19.0.0"
-
-for ($i = $logContent.Length - 1; $i -ge 0; $i--) {
-    $line = $logContent[$logContent.Length -$i]
-    
-    if ($line -and $line.startsWith("Loading player data from")) {
-        $gamePath = $line.replace("Loading player data from ", "").replace("/data.unity3d", "")
+# Find Game Folder
+foreach ($line in $logContent) {
+    if ($line -ne $null -and $line.StartsWith("Loading player data from")) {
+        $gamePath = $line -replace "Loading player data from |\/data.unity3d", ""
         break
     }
 }
 
-if ($gamePath -ne "") {
-    #Find Gacha Url
+if ($gamePath -ne $null) {
+	# Get Current Game Version
+	$version = Get-ChildItem -Path "$gamePath/webCaches" -Directory | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    # Find Gacha Url
     Write-Output "Finding Gacha Url..."
-    Copy-Item -Path "$gamePath/webCaches/$version/Cache/Cache_Data/data_2" -Destination "$gamePath/webCaches/$version/Cache/Cache_Data/data_2_copy"
-    $cacheData = Get-Content -Encoding UTF8 -Raw "$gamePath/webCaches/$version/Cache/Cache_Data/data_2_copy"
-    Remove-Item -Path "$gamePath/webCaches/$version/Cache/Cache_Data/data_2_copy"
-    $cacheDataLines = $cacheData -split '1/0/'
-    $foundUrl = "false"
-
-    for ($i = $cacheDataLines.Length - 1; $i -ge 0; $i--) {
-        $line = $cacheDataLines[$i]
-
-        if ($line.StartsWith('http') -and $line.Contains("getGachaLog")) {
-            $url = ($line -split "\0")[0]
-
-            $response = Invoke-WebRequest -Uri $url -ContentType "application/json" -UseBasicParsing | ConvertFrom-Json
-
-            if ($response.retcode -eq 0) {
-                Write-Output $url
-                Set-Clipboard -Value $url
-                Write-Output "Warp History Url has been saved to clipboard."
-                $foundUrl = "true"
-                return
-            }
-        }
+    $cacheDataLines = Get-Content -Path "$gamePath/webCaches/$version/Cache/Cache_Data/data_2" -Raw -Encoding UTF8 -PipelineVariable cacheData |
+    ForEach-Object {
+        $_ -split '1/0/'
     }
+    $foundUrl = $false
 
-    if ($foundUrl -eq "false") {
+    foreach ($line in $cacheDataLines) {
+		if ($line -match '^http.*getGachaLog') {
+			$url = ($line -split "\0")[0]
+
+			$response = Invoke-WebRequest -Uri $url -ContentType "application/json" -UseBasicParsing | ConvertFrom-Json
+
+			if ($response.retcode -eq 0) {
+				Write-Output $url
+				Set-Clipboard -Value $url
+				Write-Output "Warp History Url has been saved to clipboard."
+				$foundUrl = $true
+				break
+			}
+		}
+	}
+
+    if (-not $foundUrl) {
         Write-Output "Unable to find Gacha Url. Please open warp history in-game."
     }
+	
 } else {
     Write-Output "Unable to find Game Path. Please try re-opening the game."
 }
+
+# Remove variables from memory
+$appData=$logPath=$logContent=$gamePath=$cacheData=$cacheDataLines=$null
+
+Write-Output "Completed"
