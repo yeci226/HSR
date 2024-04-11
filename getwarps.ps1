@@ -20,10 +20,14 @@ if ($gamePath -ne $null) {
 	$version = Get-ChildItem -Path "$gamePath/webCaches" -Directory | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     # Find Gacha Url
     Write-Output "Finding Gacha Url..."
-    $cacheDataLines = Get-Content -Path "$gamePath/webCaches/$version/Cache/Cache_Data/data_2" -Raw -Encoding UTF8 -PipelineVariable cacheData |
+    # Copy the target file. Therefore the script can be run while game is opened. refer issue #3
+    Copy-Item -Path "$gamePath/webCaches/$version/Cache/Cache_Data/data_2" -Destination "$gamePath/webCaches/$version/Cache/Cache_Data/data_2_copy"
+    $cacheDataLines = Get-Content -Path "$gamePath/webCaches/$version/Cache/Cache_Data/data_2_copy" -Raw -Encoding UTF8 -PipelineVariable cacheData |
     ForEach-Object {
         $_ -split '1/0/'
     }
+    # remove the copy after read
+    Remove-Item -Path "$gamePath/webCaches/$version/Cache/Cache_Data/data_2_copy"
     $foundUrl = $false
 
     foreach ($line in $cacheDataLines) {
@@ -53,4 +57,4 @@ if ($gamePath -ne $null) {
 # Remove variables from memory
 $appData=$logPath=$logContent=$gamePath=$cacheData=$cacheDataLines=$null
 
-Write-Output "Completed"
+Write-Output "End of script"
